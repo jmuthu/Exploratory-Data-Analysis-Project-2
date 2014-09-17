@@ -1,4 +1,5 @@
 library(reshape2)
+library(ggplot2)
 dir_contents <- dir()
 if (!("summarySCC_PM25.rds" %in% dir_contents &&
         "Source_Classification_Code.rds" %in% dir_contents)){
@@ -19,18 +20,13 @@ SCC_Mobiles <- SCC[grep("Vehicles",SCC$EI.Sector),]
 NEI <- NEI[NEI$SCC %in% SCC_Mobiles$SCC,]
 
 result <- dcast(NEI, year~fips, value.var="Emissions", sum)
-result <- melt(result, id="year")
+result <- melt(result, id="year", variable.name="City")
 
-png(filename="plot6.png", width=480, height=480)
-par(bg="transparent")
-plot(result$year,
-     result$value, 
-     xlab="Year",
-     xaxt = "n",
-     pch = 20,
-     type="o",
-     main="Total PM2.5 Emissions from motor vehicles in Baltimore and Los Angeles",
-     ylab="Total PM2.5 Emissions (tons)")
-axis(1, at=result$year)
-
-dev.off()
+g <- ggplot(result, aes(x=year, y=value, color = City )) + 
+  geom_step() + geom_point() +
+  scale_colour_discrete(name  ="City",
+                        breaks=c("06037", "24510"),
+                        labels=c("Los Angels County", "Baltimore City")) +
+  labs(title = "Total PM2.5 Emissions in Baltimore And Los Angeles")  + 
+  labs(x = "Year")  + labs(y = "Total PM2.5 Emissions (tons)")
+ggsave(filename="plot6.png", plot = g)

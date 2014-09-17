@@ -25,7 +25,7 @@ plot(result$Var1,
      main="Total PM2.5 Emissions",
      ylab="Total PM2.5 Emissions (Kilotons)")
 axis(1, at=result$Var1)
-l <- lm(value~Var1,result)
+l <- lm((value/1000)~Var1,result)
 abline(l)
 
 dev.off()
